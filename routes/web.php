@@ -11,8 +11,16 @@ Route::get('/', [PageController::class, 'home'])
 Route::get('/about', [PageController::class, 'about'])
     ->name('about');
 
-Route::resource('customers', CustomerController::class)
-    ->only(['index', 'create', 'store', 'edit', 'update']);
+Route::get('/dashboard', function () {
+    return redirect()->route('customers.index');
+})->middleware('auth')->name('dashboard');
 
-Route::resource('users', UserController::class)
-    ->only(['index', 'create', 'store', 'edit', 'update']);
+Route::middleware('auth')->group(function () {
+    Route::resource('customers', CustomerController::class)
+        ->except(['show', 'destroy']);
+
+    Route::resource('users', UserController::class)
+        ->except(['show', 'destroy']);
+});
+
+require __DIR__ . '/auth.php';
